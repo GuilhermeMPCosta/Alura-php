@@ -5,14 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Serie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class SeriesController extends Controller
 {
     public function index()
     {
         $series = Serie::query()->orderBy('nome')->get();
-
-        return view('series.index')->with('series', $series);
+        $mesagemsucesso = Session('mensagem.sucesso');
+        return view('series.index')->with('series', $series)->with('mensagemdesucesso',$mesagemsucesso);
     }
 
     public function create()
@@ -22,11 +23,15 @@ class SeriesController extends Controller
 
     public function store(Request $request)
     {
-        $nomeSerie = $request->input('nome');
-        $serie = new Serie();
-        $serie->nome = $nomeSerie;
-        $serie->save();
+        Serie::create($request->all());
+        $request->session()->flash('mensagem.sucesso','Série '.$request->nome.' adicionada com sucesso');
+        return to_route('series.index');
+    }
 
-        return redirect('/series');
+    public function destroy(Request $request){
+        $serie=Serie::find($request->series);
+        Serie::destroy($request->series);
+        $request->session()->flash('mensagem.sucesso','Série '.$serie->nome.' removida com sucesso');
+        return to_route('series.index');
     }
 }
