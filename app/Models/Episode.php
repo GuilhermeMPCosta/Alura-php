@@ -9,7 +9,7 @@ class Episode extends Model
 {
     use HasFactory;
     public $timestamps = false;
-    public fillable = ['number'];
+    protected $fillable = ['number'];
     
     public function season()
     {
